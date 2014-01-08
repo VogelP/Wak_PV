@@ -14,21 +14,15 @@ WAF.onAfterInit = function onAfterInit() {// @lock
 
 	b_2.click = function b_2_click (event)// @startlock
 	{// @endlock
-		//ausgewählten Sensor acktualisieren
-		var sensor = $$("dg_Sensoren").column(1).getValueForInput();
-		var ort = $$("dg_Sensoren").column(2).getValueForInput();
-		var einheit = $$("dg_Sensoren").column(4).getValueForInput();
-		var intervall = $$("dg_Sensoren").column(5).getValueForInput();
-		var anzahl = $$("dg_Sensoren").column(6).getValueForInput();
+		//alle Sensoren acktualisieren
+		//rufe hierfür einen Web-service mit normalem HTTP-GET auf
+		var rq = new XMLHttpRequest();
+		rq.addEventListener("load", function(evt) {
+			alert(evt.target.responseText);
+		}, false);
+		rq.open('GET','/aktualisiereMessdaten',true);
+		rq.send();
 
-		ds.Messdaten.holeMessdaten(sensor, einheit, ort, intervall, anzahl, {
-		    onSuccess: function(event) {
-		        alert(event.result);
-		    },
-		    onError: function(event) {
-		        alert("Messdaten Aktualisierung fehlgeschlagen");
-		    }
-		});		
 	};// @lock
 
 	b_delSelection.click = function b_delSelection_click (event)// @startlock
