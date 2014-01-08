@@ -1,0 +1,1 @@
+﻿/*** @author peter vogel*/void addHttpRequestHandler('/aktualisiereMessdaten','requestHandlers.js','aktualisiereMessdaten');void addHttpRequestHandler('/holeMessdatenVonServer','requestHandlers.js','holeMessdatenVonServer');new SharedWorker('Workers/holeMessdaten.js', 'holeMessdaten');new SharedWorker('Workers/holeServerdaten.js', 'holeServerdaten');
