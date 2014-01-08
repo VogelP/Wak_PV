@@ -149,11 +149,18 @@ guidedModel =// @startlock
 							                actSensor.letzterWert = gelesenerWert;
 							                actSensor.save();
 							            }
+							            datenWerdenGelesen.unlock();
 							            return "Sensor " + sensor + "-" + ort + ": Daten eingelesen ok";
 							        }
-							        else return "Sensor " + sensor + "-" + ort + ": Http-Get Fehler";
+							        else {
+							        	datenWerdenGelesen.unlock();
+							        	return "Sensor " + sensor + "-" + ort + ": Http-Get Fehler";
+							   		}
 							    }
-							    else return "Sensor " + sensor + "-" + ort + ": Http-timeout";
+							    else {
+							    	datenWerdenGelesen.unlock();
+							    	return "Sensor " + sensor + "-" + ort + ": Http-timeout";
+								}
 							}
 					}
 					datenWerdenGelesen.unlock();
