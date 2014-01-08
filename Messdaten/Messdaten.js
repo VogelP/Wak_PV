@@ -57,6 +57,9 @@ guidedModel =// @startlock
 			holeMessdaten:function(sensor, einheit, ort, intervall, anzahlWerte)
 			{// @lock
 				var datenWerdenGelesen = Mutex('datenWerdenGelesen');
+				
+				//datenWerdenGelesen.unlock(); //lösche Semaphore bei Problem
+				
 				if (datenWerdenGelesen.tryToLock() == false) {
 				    return "Semaphor blockiert Lesen des Sensors "+sensor+" ";
 				}
@@ -122,7 +125,8 @@ guidedModel =// @startlock
 							            }
 							            dataArr.pop(); //ZMLOK am Ende entfernen
 							            MessBeginn = new Date(MessEnde - ((dataArr.length - 1) * intervall * 1000));
-
+							            
+							            //debugger;
 							            var letzterWert = 0;
 							            var gelesenerWert = 0;
 							            var actSensor = ds.Sensoren.find('Ort == :1 AND Sensor_ID == :2', MessOrt, MessSensor);
@@ -131,7 +135,18 @@ guidedModel =// @startlock
 							            }
 							            //schleife durch Array und speichere Daten ab StartZeit
 							            //das Ende des Arrays liegt in der Vergangenheit
-							            for (var i = dataArr.length - 1; i >= 0; i--) {
+							            
+							            //hier könnten wir die Rückschau verkürzen, indem wir die Differenz zw. aktueller Zeit u. Messzeit berechnen u. dann mit Intervall multiplizieren
+							            var diffZeit = jetzt-StartZeit;
+							            var arrElemente = Math.floor(diffZeit / (intervall * 1000));
+							            if (arrElemente < dataArr.length) {
+							            	//var MessBeginnKurz = new Date(StartZeit);
+							            	MessBeginn = new Date(StartZeit);
+							            } else { 
+							            	arrElemente = dataArr.length - 1;
+							            }
+							            
+							            for (var i = arrElemente; i >= 0; i--) { //substitute arrElemente for dataArr.length -1
 							                if (MessBeginn >= StartZeit) {
 							                    var neueDaten = ds.Messdaten.createEntity();
 							                    neueDaten.Datum_Uhrzeit = MessBeginn;
@@ -145,6 +160,8 @@ guidedModel =// @startlock
 							                }
 							                MessBeginn.setTime(MessBeginn.getTime() + Minuten * 60 * 1000); //+ Intervall in Minuten, setMinutes(), getMinutes() funktioniert nicht bei Sommer/Winter- Zeit Umschaltung
 							            }
+							            							            
+							            
 							            if ((actSensor != null) & (neueDaten != null)) {
 							                actSensor.letzterWert = gelesenerWert;
 							                actSensor.save();
