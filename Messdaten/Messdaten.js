@@ -136,7 +136,7 @@ guidedModel =// @startlock
 							            //schleife durch Array und speichere Daten ab StartZeit
 							            //das Ende des Arrays liegt in der Vergangenheit
 							            
-							            //hier könnten wir die Rückschau verkürzen, indem wir die Differenz zw. aktueller Zeit u. Messzeit berechnen u. dann mit Intervall multiplizieren
+							            //hier verkürzen wir die Rückschau, indem wir die Anzahl der Elemente berechnen, die wir zurückschauten müssen ab Startzeit
 							            var diffZeit = jetzt-StartZeit;
 							            var arrElemente = Math.floor(diffZeit / (intervall * 1000));
 							            if (arrElemente < dataArr.length) {
@@ -146,7 +146,20 @@ guidedModel =// @startlock
 							            	arrElemente = dataArr.length - 1;
 							            }
 							            
-							            for (var i = arrElemente; i >= 0; i--) { //substitute arrElemente for dataArr.length -1
+							            for (var i = arrElemente; i >= 0; i--) { //vorher mit dataArr.length -1 immer durch gesamten Array
+							            
+							            	if (i == 0) {
+							            		//Kontrolle: element-0 in empfangenem Messdaten array sollte der MessEnde- Zeit entsprechen
+							            		if (MessBeginn.getMinutes() != MessEnde.getMinutes()) {
+							            			  
+							            			var logEintrag = ds.Protokoll.createEntity();
+												    logEintrag.erstellt = jetzt;
+												    logEintrag.beschreibung = "Zeit-Messlesefehler Sensor: "+sensor.toString()+ " "+ ort + "Messende: "+MessEnde.toString()+ "Datenmessende: "+MessBeginn.toString();
+												    logEintrag.save();
+
+							            			debugger;
+							            		}
+							            	}
 							                if (MessBeginn >= StartZeit) {
 							                    var neueDaten = ds.Messdaten.createEntity();
 							                    neueDaten.Datum_Uhrzeit = MessBeginn;
@@ -160,8 +173,7 @@ guidedModel =// @startlock
 							                }
 							                MessBeginn.setTime(MessBeginn.getTime() + Minuten * 60 * 1000); //+ Intervall in Minuten, setMinutes(), getMinutes() funktioniert nicht bei Sommer/Winter- Zeit Umschaltung
 							            }
-							            							            
-							            
+							            							            							           							            
 							            if ((actSensor != null) & (neueDaten != null)) {
 							                actSensor.letzterWert = gelesenerWert;
 							                actSensor.save();
